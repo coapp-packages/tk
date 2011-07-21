@@ -1,0 +1,84 @@
+#product-info  {
+    product-name: "tk";
+    version: "8.5.10";
+    original-source-location: "http://prdownloads.sourceforge.net/tcl/tk8510-src.zip";
+    original-source-website: "http://www.tcl.tk/software/tcltk/download.html";
+    license: "Custom license, see license.terms";
+    packager: "HamishC";
+}
+
+x86 {
+    compiler: vc10-x86;
+      
+    uses:x86=@"..\tcl";
+
+    targets: {
+		"win\Release_VC10\tk85.dll",
+		"win\Release_VC10\tk85.lib",
+		"win\Release_VC10\tkstub85.lib",
+		"win\Release_VC10\wish85.exe",
+
+    };
+      
+    build-command:@"
+       rem best you have your visual studio installed in the default location...
+       IF EXIST ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" call ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" x86
+       IF EXIST ""C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" call ""C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" x86
+
+		pushd win
+                del /Q nmakehlp.exe
+                del /Q nmakehlp.obj
+			nmake -f makefile.vc TCLDIR=..\..\tcl
+		popd
+    ";
+      
+    clean-command:@"
+        rmdir /S /Q win\Release_VC10 2>NUL
+
+		del /Q win\nmakehlp.exe
+		del /Q win\nmakehlp.obj
+		del /Q win\versions.vc
+		del /Q win\vc100.pdb
+    ";
+};
+
+
+x64 {
+    compiler: vc10-x64;
+      
+    uses:x64=@"..\tcl";
+    uses:x86=@".";
+
+    targets: {
+		"win\Release_AMD64_VC10\tk85.dll",
+		"win\Release_AMD64_VC10\tk85.lib",
+		"win\Release_AMD64_VC10\tkstub85.lib",
+		"win\Release_AMD64_VC10\wish85.exe"
+    };
+      
+    build-command:@"
+       rem best you have your visual studio installed in the default location...
+       IF EXIST ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" (
+           call ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" amd64 
+		pushd win
+			nmake -f makefile.vc TCLDIR=..\..\tcl MACHINE=AMD64
+		popd
+       )       
+       IF EXIST ""C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" (
+           call ""C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" x86_amd64
+		pushd win
+			nmake -f makefile.vc TCLDIR=..\..\tcl MACHINE=AMD64 TCLSH_NATIVE=1
+		popd
+       )
+    ";
+      
+    clean-command:@"
+           IF EXIST win\Release_VC10 rmdir /S /Q win\Release_VC10 2>NUL
+           IF EXIST win\Release_AMD64_VC10 rmdir /S /Q win\Release_AMD64_VC10 2>NUL
+		del /Q win\nmakehlp.exe
+		del /Q win\nmakehlp.obj
+		del /Q win\versions.vc
+    ";
+};
+
+
